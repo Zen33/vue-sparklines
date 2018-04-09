@@ -1,19 +1,17 @@
 import Line from './Line'
 import Curve from './Curve'
-// import Bar from './Bar' // TODO
-import Spot from './Spot'
-import RefLine from './RefLine'
-import Text from './Text'
+import Bar from './Bar'
+// import Pie from './Pie' // TODO
 import dataToPoints from './utils/dataToPoints'
 
 export default {
   name: 'sparkline',
   props: {
-    data: {
-      type: Array,
-      default: [],
-      required: true
-    },
+    // data: {
+    //   type: Array,
+    //   default: []
+    //   // required: true
+    // },
     // point: {
     //   type: Object,
     //   default: {
@@ -37,12 +35,6 @@ export default {
       type: [Number, String],
       default: 30
     },
-    svgWidth: {
-      type: [Number, String]
-    },
-    svgHeight: {
-      type: [Number, String]
-    },
     preserveAspectRatio: { // 是否scale
       type: String,
       default: 'none'
@@ -57,16 +49,6 @@ export default {
     max: {
       type: Number
     },
-    color: {
-      type: String
-    },
-    mouseEvents: {
-      type: Function
-    },
-    children: { // 图表子集：['line'], ['curve', 'bar']...
-      type: Array,
-      default: () => ['curve']
-    },
     hasSpot: {
       type: Boolean,
       default: false
@@ -77,9 +59,16 @@ export default {
         size: 3,
         spotColors: {
           '-1': 'red',
-          '0': 'black',
+          '0': 'yellow',
           '1': 'green'
         }
+      })
+    },
+    spotStyles: {
+      type: Object,
+      default: () => ({
+        strokeOpacity: 0,
+        fillOpacity: 0
       })
     },
     refLineType: { // 参考线样式'max', 'min', 'mean', 'avg', 'median', 'custom' or false
@@ -92,109 +81,54 @@ export default {
         value: null
       })
     },
-    text: {
-      type: String,
-      default: ''
-    },
-    // 各自图形样式如下
-    sparklineStyles: {
+    // text: {
+    //   type: String,
+    //   default: ''
+    // },
+    styles: {
       type: Object,
       default: () => ({})
-    },
-    lineStyles: {
-      type: Object,
-      default: () => ({
-        strokeWidth: 2,
-        stroke: '#fff'
-      })
-    },
-    curveStyles: {
-      type: Object,
-      default: () => ({
-        strokeWidth: 2,
-        stroke: '#fff' 
-      })
-    },
-    spotStyles: {
-      type: Object,
-      default: () => ({
-        fill: '#fff'
-      })
-    },
-    // barStyles: { // TODO
-    //   type: Object,
-    //   default: () => ({})
-    // },
-    refLineStyles: {
-      type: Object,
-      default: () => ({
-        stroke: '#fff',
-        strokeOpacity: 1,
-        strokeDasharray: '5, 5'
-      })
     },
     textStyles: {
       type: Object,
       default: () => ({
-        color: '#fff',
-        fontSize: '10px'
+        fontSize: 10
       })
     }
   },
   render (h) {
-    const { data, limit, text, spotlight, width, height, svgWidth, svgHeight, preserveAspectRatio, margin, max, min, color, mouseEvents, children, hasSpot, spotProps, refLineType, refLineProps, sparklineStyles, lineStyles, curveStyles, spotStyles, barStyles, refLineStyles, textStyles } = this
-    if (!data.length) {
-      return null
-    }
-    const points = dataToPoints({
-      data,
-      limit,
-      width,
-      height,
-      margin,
-      max,
-      min
-    })
+    const { width, height, preserveAspectRatio, margin, max, min, hasSpot, spotProps, refLineType, refLineProps, styles, textStyles } = this
     const svgOpts = {
       viewBox: `0 0 ${width} ${height}`,
       preserveAspectRatio
     }
-    sparklineStyles.width = width
-    sparklineStyles.height = height
-    const props = this.$props
-    props.points = points
-  
-    svgWidth > 0 && (svgOpts.width = svgWidth)
-    svgHeight > 0 && (svgOpts.height = svgHeight)
-
+    styles.width = width
+    styles.height = height
+    const rootProps = this.$props
+    rootProps.dataToPoints = dataToPoints
+    const slots = this.$slots.default
     return h('div', {
       'class': 'sparkline-wrap'
     }, [
       h('svg', {
-        style: sparklineStyles,
-        attrs: {
-          viewBox: `0 0 ${width} ${height}`,
-          preserveAspectRatio
-        }
+        style: styles,
+        attrs: svgOpts
       }, (() => {
-        const items = children.map(item => {
-          if (item === 'line') {
+        const items = slots.map(item => {
+          const tag = item.tag
+          const props = Object.assign({}, rootProps, item.data && item.data.attrs || {})
+          if (tag === 'sparklineLine') {
             return h(Line, { props })
-          } else if (item === 'curve') {
+          } else if (tag === 'sparklineCurve') {
             return h(Curve, { props })
-          // } else {
-          //   return h(Text, { props })
+          } else if (tag === 'sparklineBar') {
+            return h(Bar, { props })
+          // } else { // TODO
+          //   return h(Pie, { props })
           }
         })
-        hasSpot && items.push(h(Spot, { props }))
-        refLineType && items.push(h(RefLine, { props }))
         return items
-      })()),
-      h('div', {
-        style: textStyles,
-        'class': 'sparkline-text',
-        ref: 'sparklineText'
-      }, text)
+      })())
     ])
   }
 }

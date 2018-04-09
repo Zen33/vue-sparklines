@@ -1,7 +1,7 @@
 export default {
-  props: ['points', 'spotStyles', 'spotProps', 'onMouseMove'],
+  props: ['points', 'spotStyles', 'spotProps'],
   methods: {
-    lastDirection (points) {
+    lastPoint (points) {
       const pl = points.length
       Math.sign = Math.sign || (x => {
         return x > 0 ? 1 : -1
@@ -23,9 +23,11 @@ export default {
         }
       }))
       items.push(h('circle', {
-        style: spotStyles || {
-          fill: spotProps.spotColors[this.lastDirection(points)]
-        },
+        style: Object.assign(spotStyles, {
+          fill: spotProps.spotColors[this.lastPoint(points)],
+          fillOpacity: 1,
+          strokeOpacity: 1
+        }),
         attrs: {
           cx: points[pl - 1].x,
           cy: points[pl - 1].y,

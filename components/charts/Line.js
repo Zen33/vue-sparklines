@@ -1,7 +1,25 @@
+import Spot from './Spot'
+import Text from './Text'
+import RefLine from './RefLine'
+import * as utils from './utils'
+
 export default {
-  props: ['data', 'hasSpot', 'points', 'width', 'height', 'margin', 'color', 'lineStyles', 'spotStyles', 'spotProps', 'mouseEvents'],
+  name: 'sparkline-line',
+  props: ['data', 'hasSpot', 'limit', 'max', 'min', 'spotlight', 'width', 'height', 'margin', 'styles', 'spotStyles', 'spotProps', 'dataToPoints', 'refLineType', 'refLineStyles', 'textStyles', 'mouseEvents'],
   render (h) {
-    const { data, hasSpot, points, width, height, margin, color, lineStyles, spotStyles, spotProps, mouseEvents } = this
+    const { data = [], hasSpot, limit, max, min, spotlight, width, height, margin, styles, spotStyles, spotProps, dataToPoints, refLineType, refLineStyles, textStyles, mouseEvents } = this
+    const hasSpotlight = typeof spotlight === 'number'
+    const leeway = 10
+    const points = dataToPoints({
+      data,
+      limit,
+      width,
+      height,
+      margin,
+      max,
+      min,
+      textHeight: hasSpotlight ? leeway : 0
+    })
     const linePoints = points.map(p => [p.x, p.y]).reduce((a, b) => a.concat(b))
     const closePolyPoints = [
       points[points.length - 1].x,
@@ -13,18 +31,31 @@ export default {
     ]
     const fillPoints = linePoints.concat(closePolyPoints)
     const lineStyle = {
-      stroke: color || lineStyles.stroke || 'slategray',
-      strokeWidth: lineStyles.strokeWidth || '1',
-      strokeLinejoin: lineStyles.strokeLinejoin || 'round',
-      strokeLinecap: lineStyles.strokeLinecap || 'round',
+      stroke: styles.stroke || 'slategray',
+      strokeWidth: styles.strokeWidth || '1',
+      strokeLinejoin: styles.strokeLinejoin || 'round',
+      strokeLinecap: styles.strokeLinecap || 'round',
       fill: 'none'
     }
     const fillStyle = {
-      stroke: lineStyles.stroke || 'none',
+      stroke: styles.stroke || 'none',
       strokeWidth: '0',
-      fillOpacity: lineStyles.fillOpacity || '.1',
-      fill: lineStyles.fill || color || 'none', // slategray
+      fillOpacity: styles.fillOpacity || '.1',
+      fill: styles.fill || 'none', // slategray
       pointerEvents: 'auto'
+    }
+    const props = this.$props
+    props.points = points
+    const checkSpotType = (items, p, i) => {
+      if (!hasSpot && !hasSpotlight) {
+        return true
+      } else if (!hasSpot && spotlight === i) {
+        props.text = data[spotlight]
+        props.point = p
+        items.push(h(Text, { props }))
+        return true
+      }
+      return false
     }
     return h('g', (() => {
       const items = []
@@ -40,21 +71,22 @@ export default {
           points: linePoints.join(' ')
         }
       }))
-      points.map((p, i) => {
-        return !hasSpot && items.push(h('circle', {
+      hasSpotlight && points.map((p, i) => {
+        return checkSpotType(items, p, i) && items.push(h('circle', {
           style: spotStyles,
           attrs: {
             cx: p.x,
             cy: p.y,
             r: spotProps.size
           },
-          on: {
-            'click': () => { // mousedown
-              mouseEvents && mouseEvents('enter', data[i], p)
-            }
-          }
+          props: {
+            key: i
+          },
+          on: utils['evt'](mouseEvents, data[i], p)
         }))
       })
+      hasSpot && items.push(h(Spot, { props }))
+      refLineStyles && items.push(h(RefLine, { props }))
       return items
     })())
   }

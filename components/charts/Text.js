@@ -1,7 +1,7 @@
 export default {
-  props: ['point', 'text', 'textStyles'],
+  props: ['point', 'margin', 'text', 'textStyles'],
   render (h) {
-    const { point, text, textStyles } = this
+    const { point, margin, text, textStyles } = this
     const { x, y } = point
     return h('g', [
       h('text', {
@@ -9,8 +9,17 @@ export default {
         attrs: {
           x,
           y
-        }
+        },
+        ref: 'sparklineText'
       }, text)
     ])
+  },
+  mounted () {
+    const text = this.$refs.sparklineText
+    const textBox = text && text.getBBox()
+    if (textBox) {
+      text.setAttribute('x', textBox.x - textBox.width / 2)
+      text.setAttribute('y', this.margin + textBox.height / 2)
+    }
   }
 }
