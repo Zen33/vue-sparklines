@@ -5,9 +5,9 @@ import * as utils from './utils'
 
 export default {
   name: 'sparkline-line',
-  props: ['data', 'hasSpot', 'limit', 'max', 'min', 'spotlight', 'width', 'height', 'margin', 'styles', 'spotStyles', 'spotProps', 'dataToPoints', 'refLineType', 'refLineStyles', 'textStyles', 'mouseEvents'],
+  props: ['data', 'hasSpot', 'limit', 'max', 'min', 'spotlight', 'width', 'height', 'margin', 'styles', 'spotStyles', 'spotProps', 'dataToPoints', 'refLineType', 'refLineStyles', 'textStyles', 'bus', 'mouseEvents'],
   render (h) {
-    const { data = [], hasSpot, limit, max, min, spotlight, width, height, margin, styles, spotStyles, spotProps, dataToPoints, refLineType, refLineStyles, textStyles, mouseEvents } = this
+    const { data = [], hasSpot, limit, max, min, spotlight, width, height, margin, styles, spotStyles, spotProps, dataToPoints, refLineType, refLineStyles, textStyles, bus, mouseEvents } = this
     const hasSpotlight = typeof spotlight === 'number'
     const leeway = 10
     const points = dataToPoints({
@@ -19,6 +19,14 @@ export default {
       max,
       min,
       textHeight: hasSpotlight ? leeway : 0
+    })
+    bus && bus.$emit('setValue', {
+      id: `sparkline__${this._uid}`,
+      color: styles.stroke || styles.fill || '#fff',
+      data,
+      points,
+      limit,
+      type: 'line'
     })
     const linePoints = points.map(p => [p.x, p.y]).reduce((a, b) => a.concat(b))
     const closePolyPoints = [
@@ -77,7 +85,8 @@ export default {
           attrs: {
             cx: p.x,
             cy: p.y,
-            r: spotProps.size
+            r: spotProps.size,
+            rel: data[i]
           },
           props: {
             key: i

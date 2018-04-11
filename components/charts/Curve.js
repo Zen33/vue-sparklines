@@ -5,9 +5,9 @@ import * as utils from './utils'
 
 export default {
   name: 'sparkline-curve',
-  props: ['data', 'hasSpot', 'limit', 'max', 'min', 'spotlight', 'width', 'height', 'margin', 'styles', 'spotStyles', 'spotProps', 'dataToPoints', 'refLineType', 'refLineStyles', 'textStyles', 'mouseEvents'],
+  props: ['data', 'hasSpot', 'limit', 'max', 'min', 'spotlight', 'width', 'height', 'margin', 'styles', 'spotStyles', 'spotProps', 'dataToPoints', 'refLineType', 'refLineStyles', 'textStyles', 'bus', 'mouseEvents'],
   render (h) {
-    const { data = [], hasSpot, limit, max, min, spotlight, width, height, margin, styles, spotStyles, spotProps, dataToPoints, refLineType, refLineStyles, textStyles, mouseEvents, divisor = 0.5 } = this // 0.25
+    const { data = [], hasSpot, limit, max, min, spotlight, width, height, margin, styles, spotStyles, spotProps, dataToPoints, refLineType, refLineStyles, textStyles, bus, mouseEvents, divisor = 0.5 } = this // 0.25
     const hasSpotlight = typeof spotlight === 'number'
     const leeway = 10
     const points = dataToPoints({
@@ -19,6 +19,14 @@ export default {
       max,
       min,
       textHeight: hasSpotlight ? leeway : 0
+    })
+    bus && bus.$emit('setValue', {
+      id: `sparkline__${this._uid}`,
+      color: styles.stroke || styles.fill || '#fff',
+      data,
+      points,
+      limit,
+      type: 'curve'
     })
     let prev
     const curve = p => {
@@ -90,13 +98,14 @@ export default {
           d: `M${linePoints.join(' ')}`
         }
       }))
-      points.map((p, i) => {
+      hasSpotlight && points.map((p, i) => {
         return checkSpotType(items, p, i) && items.push(h('circle', {
           style: spotStyles,
           attrs: {
             cx: p.x,
             cy: p.y,
-            r: spotProps.size
+            r: spotProps.size,
+            rel: data[i]
           },
           props: {
             key: i
