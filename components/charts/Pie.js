@@ -1,5 +1,3 @@
-import * as utils from './utils'
-
 export default {
   name: 'sparkline-pie',
   props: ['data', 'max', 'min', 'width', 'height', 'margin', 'styles', 'tooltipProps', 'indicatorStyles'],
