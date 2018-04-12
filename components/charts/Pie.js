@@ -2,15 +2,15 @@ import * as utils from './utils'
 
 export default {
   name: 'sparkline-pie',
-  props: ['data', 'max', 'min', 'width', 'height', 'margin', 'styles', 'tooltipProps'],
-  watch: {
-    data (val) {
-      this.hideTooltip()
+  props: ['data', 'max', 'min', 'width', 'height', 'margin', 'styles', 'tooltipProps', 'indicatorStyles'],
+  data () {
+    return {
+      onFocus: false
     }
   },
-  computed: {
-    chartType () {
-      return 'pie'
+  watch: {
+    data () {
+      this.onFocus && this.hideTooltip()
     }
   },
   methods: {
@@ -35,20 +35,26 @@ export default {
     }
   },
   render (h) {
-    const { data = [], max, min, width, height, margin, styles, tooltipProps } = this
-    const parentVm = this.$parent
+    const { data = [], max, min, width, height, margin, styles, tooltipProps, indicatorStyles } = this
+    if (!data.length) {
+      return null
+    }
     const center = Math.min(width / 2, height / 2)
     const strokeWidth = styles && styles.strokeWidth || 0
     const radius = center - strokeWidth / 2
     // const radius = center - margin
     let prevPieNumbers = 0
-    for (let child of parentVm.$children) {
-      (child.chartType === 'pie') && prevPieNumbers++
+    for (let slot of this.$parent.$slots.default) {
+      (slot.tag === 'sparklinePie') && prevPieNumbers++
+    }
+    if (prevPieNumbers > 1) { // 理论上slot只有一个饼图
+      return null
     }
     const total = Math.ceil(data.reduce((a, b) => (b.hasOwnProperty('value') ? b.value : b) + a, 0))
     let angleStart = 0
     let angleEnd = 0
-    let startX = center + (prevPieNumbers > 1 ? prevPieNumbers - 1 : 0) * (radius + margin * 2)
+    // const startX = center + (prevPieNumbers > 1 ? prevPieNumbers - 1 : 0) * (radius + margin * 2)
+    const startX = center
     return h('g', {
       attrs: {
         // transform: `translate(0, 0)`
@@ -66,8 +72,14 @@ export default {
             fill: data[0].color
           },
           on: {
-            mousemove: evt => this.showTooltip(evt, data[0].value, data[0].color),
-            mouseleave: () => this.hideTooltip()
+            mousemove: evt => {
+              this.onFocus = true
+              indicatorStyles && this.showTooltip(evt, data[0].value, data[0].color)
+            },
+            mouseleave: () => {
+              this.onFocus = false
+              this.hideTooltip()
+            }
           }
         }))
       } else {
@@ -93,8 +105,14 @@ export default {
               key: i
             },
             on: {
-              mousemove: evt => this.showTooltip(evt, value, color),
-              mouseleave: () => this.hideTooltip()
+              mousemove: evt => {
+                this.onFocus = true
+                indicatorStyles && this.showTooltip(evt, value, color)
+              },
+              mouseleave: () => {
+                this.onFocus = false
+                this.hideTooltip()
+              }
             }
           }))
         })

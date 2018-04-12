@@ -6,6 +6,9 @@ export default {
   props: ['data', 'limit', 'max', 'min', 'width', 'height', 'margin', 'styles', 'dataToPoints', 'refLineType', 'refLineStyles', 'bus', 'mouseEvents'],
   render (h) {
     const { data = [], limit, max, min, width, height, margin, styles, dataToPoints, refLineType, refLineStyles, bus, mouseEvents } = this
+    if (!data.length) {
+      return null
+    }
     const points = dataToPoints({
       data,
       limit,

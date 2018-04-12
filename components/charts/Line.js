@@ -8,6 +8,9 @@ export default {
   props: ['data', 'hasSpot', 'limit', 'max', 'min', 'spotlight', 'width', 'height', 'margin', 'styles', 'spotStyles', 'spotProps', 'dataToPoints', 'refLineType', 'refLineStyles', 'textStyles', 'bus', 'mouseEvents'],
   render (h) {
     const { data = [], hasSpot, limit, max, min, spotlight, width, height, margin, styles, spotStyles, spotProps, dataToPoints, refLineType, refLineStyles, textStyles, bus, mouseEvents } = this
+    if (!data.length) {
+      return null
+    }
     const hasSpotlight = typeof spotlight === 'number'
     const leeway = 10
     const points = dataToPoints({
