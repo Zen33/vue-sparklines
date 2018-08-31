@@ -2,12 +2,93 @@ import Spot from './Spot'
 import Text from './Text'
 import RefLine from './RefLine'
 import * as utils from './utils'
+import dataToPoints from './utils/dataToPoints'
 
 export default {
   name: 'sparkline-line',
-  props: ['data', 'hasSpot', 'limit', 'max', 'min', 'spotlight', 'width', 'height', 'margin', 'styles', 'spotStyles', 'spotProps', 'dataToPoints', 'refLineType', 'refLineStyles', 'textStyles', 'bus', 'mouseEvents'],
+  props: {
+    data: {
+      type: Array,
+      default: () => []
+    },
+    hasSpot: {
+      type: Boolean,
+      default: false
+    },
+    limit: {
+      type: [Number, String],
+      default: 3
+    },
+    width: {
+      type: [Number, String],
+      default: 100
+    },
+    height: {
+      type: [Number, String],
+      default: 30
+    },
+    margin: {
+      type: Number,
+      default: 3
+    },
+    styles: {
+      type: Object,
+      default: () => ({})
+    },
+    max: {
+      type: Number
+    },
+    min: {
+      type: Number
+    },
+    spotlight: {
+      type: [Number, Boolean],
+      default: false
+    },
+    spotStyles: {
+      type: Object,
+      default: () => ({
+        strokeOpacity: 0,
+        fillOpacity: 0
+      })
+    },
+    spotProps: {
+      type: Object,
+      default: () => ({
+        size: 3,
+        spotColors: {
+          '-1': 'red',
+          '0': 'yellow',
+          '1': 'green'
+        }
+      })
+    },
+    refLineType: { // 'max', 'min', 'mean', 'avg', 'median', 'custom' or false
+      type: [String, Boolean],
+      default: 'mean'
+    },
+    refLineStyles: {
+      stroke: '#d14',
+      strokeOpacity: 1,
+      strokeDasharray: '2, 2'
+    },
+    refLineProps: {
+      type: Object,
+      default: () => ({
+        value: null
+      })
+    },
+    mouseEvents: Function,
+    bus: Object,
+    textStyles: {
+      type: Object,
+      default: () => ({
+        fontSize: 10
+      })
+    }
+  },
   render (h) {
-    const { data = [], hasSpot, limit, max, min, spotlight, width, height, margin, styles, spotStyles, spotProps, dataToPoints, refLineType, refLineStyles, textStyles, bus, mouseEvents } = this
+    const { data = [], hasSpot, limit, width, height, margin, styles, max, min, spotlight, spotStyles, spotProps, refLineStyles, bus, mouseEvents, textStyles} = this
     if (!data.length) {
       return null
     }
@@ -63,6 +144,7 @@ export default {
       } else if (!hasSpot && spotlight === i) {
         props.text = data[spotlight]
         props.point = p
+        props.textStyles = textStyles
         items.push(h(Text, { props }))
         return true
       }

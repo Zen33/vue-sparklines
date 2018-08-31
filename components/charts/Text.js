@@ -1,7 +1,7 @@
 export default {
   props: ['point', 'margin', 'text', 'textStyles'],
   render (h) {
-    const { point, margin, text, textStyles } = this
+    const { point, text, textStyles } = this
     const { x, y } = point
     return h('g', [
       h('text', {

@@ -1,11 +1,82 @@
 import RefLine from './RefLine'
 import * as utils from './utils'
+import dataToPoints from './utils/dataToPoints'
 
 export default {
   name: 'sparkline-bar',
-  props: ['data', 'limit', 'max', 'min', 'width', 'height', 'margin', 'styles', 'dataToPoints', 'refLineType', 'refLineStyles', 'bus', 'mouseEvents'],
+  props: {
+    data: {
+      type: Array,
+      default: () => []
+    },
+    limit: {
+      type: [Number, String],
+      default: 3
+    },
+    width: {
+      type: [Number, String],
+      default: 100
+    },
+    height: {
+      type: [Number, String],
+      default: 30
+    },
+    margin: {
+      type: Number,
+      default: 3
+    },
+    styles: {
+      type: Object,
+      default: () => ({})
+    },
+    max: {
+      type: Number
+    },
+    min: {
+      type: Number
+    },
+    spotlight: {
+      type: [Number, Boolean],
+      default: false
+    },
+    spotStyles: {
+      type: Object,
+      default: () => ({
+        strokeOpacity: 0,
+        fillOpacity: 0
+      })
+    },
+    spotProps: {
+      type: Object,
+      default: () => ({
+        size: 3,
+        spotColors: {
+          '-1': 'red',
+          '0': 'yellow',
+          '1': 'green'
+        }
+      })
+    },
+    refLineType: { // 'max', 'min', 'mean', 'avg', 'median', 'custom' or false
+      type: [String, Boolean],
+      default: 'mean'
+    },
+    refLineStyles: {
+      stroke: '#d14',
+      strokeOpacity: 1,
+      strokeDasharray: '2, 2'
+    },
+    refLineProps: {
+      type: Object,
+      default: () => ({
+        value: null
+      })
+    },
+    mouseEvents: Function,
+    bus: Object
+  },
   render (h) {
-    const { data = [], limit, max, min, width, height, margin, styles, dataToPoints, refLineType, refLineStyles, bus, mouseEvents } = this
+    const { data = [], limit, width, height, margin, styles, max, min, refLineStyles, bus, mouseEvents } = this
     if (!data.length) {
       return null
     }

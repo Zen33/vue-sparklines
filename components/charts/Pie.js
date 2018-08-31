@@ -1,6 +1,54 @@
 export default {
   name: 'sparkline-pie',
-  props: ['data', 'max', 'min', 'width', 'height', 'margin', 'styles', 'tooltipProps', 'indicatorStyles'],
+  props: {
+    data: {
+      type: Array,
+      default: () => []
+    },
+    width: {
+      type: [Number, String],
+      default: 100
+    },
+    height: {
+      type: [Number, String],
+      default: 30
+    },
+    margin: {
+      type: Number,
+      default: 3
+    },
+    styles: {
+      type: Object,
+      default: () => ({})
+    },
+    indicatorStyles: {
+      type: [Object, Boolean],
+      default: () => ({
+        stroke: 'red'
+      })
+    },
+    tooltipProps: {
+      type: Object,
+      default: () => ({
+        formatter () {
+          return null
+        }
+      })
+    },
+    tooltipStyles: {
+      type: Object,
+      default: () => ({
+        position: 'absolute',
+        display: 'none',
+        background: 'rgba(0, 0, 0, 0.6)',
+        borderRadius: '3px',
+        minWidth: '30px',
+        padding: '3px',
+        color: '#fff',
+        fontSize: '12px'
+      })
+    }
+  },
   data () {
     return {
       onFocus: false
@@ -33,7 +81,7 @@ export default {
     }
   },
   render (h) {
-    const { data = [], max, min, width, height, margin, styles, tooltipProps, indicatorStyles } = this
+    const { data = [], width, height, margin, styles, tooltipProps, indicatorStyles } = this
     if (!data.length) {
       return null
     }
@@ -45,7 +93,7 @@ export default {
     for (let slot of this.$parent.$slots.default) {
       (slot.tag === 'sparklinePie') && prevPieNumbers++
     }
-    if (prevPieNumbers > 1) { // 理论上slot只有一个饼图
+    if (prevPieNumbers > 1) {
       return null
     }
     const total = Math.ceil(data.reduce((a, b) => (b.hasOwnProperty('value') ? b.value : b) + a, 0))

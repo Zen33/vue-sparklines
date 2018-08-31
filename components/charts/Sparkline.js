@@ -3,24 +3,10 @@ import Line from './Line'
 import Curve from './Curve'
 import Bar from './Bar'
 import Pie from './Pie'
-import dataToPoints from './utils/dataToPoints'
 
 export default {
   name: 'sparkline',
   props: {
-    // data: {
-    //   type: Array,
-    //   default: []
-    //   // required: true
-    // },
-    spotlight: { // 高亮显示索引值
-      type: [Number, Boolean],
-      default: false
-    },
-    limit: { // 单次呈现数据点集数量
-      type: [Number, String],
-      default: 3
-    },
     width: {
       type: [Number, String],
       default: 100
@@ -29,69 +15,25 @@ export default {
       type: [Number, String],
       default: 30
     },
-    preserveAspectRatio: { // 是否scale
+    preserveAspectRatio: {
       type: String,
       default: 'none'
     },
     margin: {
       type: Number,
-      default: 3
+      default: 2
     },
-    min: {
-      type: Number
-    },
-    max: {
-      type: Number
-    },
-    hasSpot: { // 是否有端点
-      type: Boolean,
-      default: false
-    },
-    spotProps: { // 端点属性
-      type: Object,
-      default: () => ({
-        size: 3,
-        spotColors: {
-          '-1': 'red',
-          '0': 'yellow',
-          '1': 'green'
-        }
-      })
-    },
-    spotStyles: { // 端点样式
-      type: Object,
-      default: () => ({
-        strokeOpacity: 0,
-        fillOpacity: 0
-      })
-    },
-    refLineType: { // 参考线样式'max', 'min', 'mean', 'avg', 'median', 'custom' or false
-      type: [String, Boolean],
-      default: 'mean'
-    },
-    refLineProps: { // 参考线属性
-      type: Object,
-      default: () => ({
-        value: null
-      })
-    },
-    styles: { // sparkline样式
+    styles: {
       type: Object,
       default: () => ({})
     },
-    textStyles: { // 高亮文字样式
-      type: Object,
-      default: () => ({
-        fontSize: 10
-      })
-    },
-    indicatorStyles: { // 指示器样式
+    indicatorStyles: {
       type: [Object, Boolean],
       default: () => ({
         stroke: 'red'
       })
     },
-    tooltipProps: { // tooltip属性
+    tooltipProps: {
       type: Object,
       default: () => ({
         formatter () {
@@ -99,7 +41,7 @@ export default {
         }
       })
     },
-    tooltipStyles: { // tooltip样式
+    tooltipStyles: {
       type: Object,
       default: () => ({
         position: 'absolute',
@@ -152,11 +94,11 @@ export default {
       tooltip && (tooltip.style.display = status ? '' : 'none')
       indicator && (indicator.style.display = status ? '' : 'none')
     },
-    updateData() {
+    updateData () {
       if (!this.onFocus) {
         return false
       }
-      let leeway
+      let rect
       let curData
       let tooltipContent = ''
       const tooltip = this.$refs.sparklineTooltip
@@ -167,19 +109,20 @@ export default {
           for (let [index, pos] of this.datum[datum].points.entries()) {
             if (this.curEvt.ox < pos.x && curData === null) {
               this.setStatus()
-              leeway = tooltip.getBoundingClientRect()
+              rect = tooltip.getBoundingClientRect()
               curData = {
                 value: this.datum[datum].data[index],
-                color: this.datum[datum].color
+                color: this.datum[datum].color,
+                index
               }
               tooltipContent += `<span style="color:${curData.color};">&bull;</span>&nbsp;${curData.value}<br />`
             }
           }
         }
       }
-      if (leeway) {
-        tooltip.style.left = `${this.curEvt.cx + leeway.width * .25}px`
-        tooltip.style.top = `${this.curEvt.cy - leeway.height}px`
+      if (rect) {
+        tooltip.style.left = `${this.curEvt.cx + rect.width * .25}px`
+        tooltip.style.top = `${this.curEvt.cy - rect.height}px`
         try {
           tooltip.innerHTML = this.tooltipProps.formatter(curData) || tooltipContent
         } catch (e) {
@@ -189,7 +132,7 @@ export default {
     }
   },
   render (h) {
-    const { width, height, preserveAspectRatio, margin, max, min, hasSpot, spotProps, refLineType, refLineProps, styles, textStyles, indicatorStyles, tooltipProps } = this
+    const { width, height, preserveAspectRatio, styles, indicatorStyles } = this
     const svgOpts = {
       viewBox: `0 0 ${width} ${height}`,
       preserveAspectRatio
@@ -197,7 +140,6 @@ export default {
     styles.width = width
     styles.height = height
     const rootProps = this.$props
-    rootProps.dataToPoints = dataToPoints
     indicatorStyles && (rootProps.bus = this.bus)
     const slots = this.$slots.default
     return h('div', {
@@ -247,7 +189,7 @@ export default {
           }
         })
         if (indicatorStyles) {
-          indicatorStyles['shape-rendering'] = 'crispEdges' // 去除line虚化
+          indicatorStyles['shape-rendering'] = 'crispEdges'
           indicatorStyles['display'] = 'none'
           items.push(h('line', {
             style: indicatorStyles,
