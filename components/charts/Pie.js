@@ -73,7 +73,7 @@ export default {
         tooltip.style.left = `${evt.clientX + leeway.width * .25}px`
         tooltip.style.top = `${evt.clientY - leeway.height}px`
         try {
-          tooltip.innerHTML = tooltipProps.formatter({ value, color}) || tooltipContent
+          tooltip.innerHTML = this.tooltipProps.formatter({ value, color}) || tooltipContent
         } catch (e) {
           return (tooltip.innerHTML = tooltipContent)
         }

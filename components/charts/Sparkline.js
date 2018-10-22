@@ -137,8 +137,8 @@ export default {
       viewBox: `0 0 ${width} ${height}`,
       preserveAspectRatio
     }
-    styles.width = width
-    styles.height = height
+    styles.width = `${parseInt(width, 10)}px`
+    styles.height = `${parseInt(height, 10)}px`
     const rootProps = this.$props
     indicatorStyles && (rootProps.bus = this.bus)
     const slots = this.$slots.default
