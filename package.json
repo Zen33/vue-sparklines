@@ -1,10 +1,9 @@
 {
   "name": "vue-sparklines",
-  "version": "0.1.8",
-  "description": "Sparkline chart built with Vue, by zhaopin.com CRM FE team.",
+  "version": "0.2.0",
+  "description": "Sparkline chart built with Vue, by tangzhen@me.com.",
   "main": "",
   "keywords": [
-    "zhaopin.com",
     "vue",
     "components",
     "chart"
@@ -42,7 +41,7 @@
     "vue-loader": "^11.1.4",
     "vue-style-loader": "^2.0.3",
     "vue-template-compiler": "^2.2.1",
-    "webpack": "^2.2.1",
+    "webpack": "^3.4.1",
     "webpack-dev-server": "^2.4.1"
   }
 }

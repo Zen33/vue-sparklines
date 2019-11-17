@@ -68,9 +68,12 @@ export default {
       default: 'mean'
     },
     refLineStyles: {
-      stroke: '#d14',
-      strokeOpacity: 1,
-      strokeDasharray: '2, 2'
+      type: Object,
+      default: () => ({
+        stroke: '#d14',
+        strokeOpacity: 1,
+        strokeDasharray: '2, 2'
+      })
     },
     refLineProps: {
       type: Object,
@@ -92,10 +95,30 @@ export default {
     }
   },
   render (h) {
-    const { data = [], hasSpot, limit, width, height, margin, styles, max, min, spotlight, spotStyles, spotProps, refLineStyles, bus, mouseEvents, divisor, textStyles } = this // 0.25
+    const {
+      data = [],
+      hasSpot,
+      limit,
+      width,
+      height,
+      margin,
+      styles,
+      max,
+      min,
+      spotlight,
+      spotStyles,
+      spotProps,
+      refLineStyles,
+      bus,
+      mouseEvents,
+      divisor,
+      textStyles
+    } = this // 0.25
+
     if (!data.length) {
       return null
     }
+
     const hasSpotlight = typeof spotlight === 'number'
     const leeway = 10
     const points = dataToPoints({
@@ -108,6 +131,7 @@ export default {
       min,
       textHeight: hasSpotlight ? leeway : 0
     })
+
     bus && bus.$emit('setValue', {
       id: `sparkline__${this._uid}`,
       color: styles.stroke || styles.fill || '#fff',
@@ -116,13 +140,16 @@ export default {
       limit,
       type: 'curve'
     })
+
     let prev
     const curve = p => {
       let res
+
       if (!prev) {
         res = [p.x, p.y]
       } else {
         const len = (p.x - prev.x) * divisor
+
         res = [
           'C',
           prev.x + len,
@@ -136,6 +163,7 @@ export default {
       prev = p
       return res
     }
+
     const linePoints = points.map(p => curve(p)).reduce((a, b) => a.concat(b))
     const closePolyPoints = [
       `L${points[points.length - 1].x}`,
@@ -160,7 +188,9 @@ export default {
       fill: styles.fill || 'none'
     }
     const props = this.$props
+
     props.points = points
+
     const checkSpotType = (items, p, i) => {
       if (!hasSpot && !hasSpotlight) {
         return true
@@ -175,6 +205,7 @@ export default {
     }
     return h('g', (() => {
       const items = []
+
       items.push(h('path', {
         style: fillStyle,
         attrs: {

@@ -1,5 +1,8 @@
+import MaxZIndex from './mixins'
+
 export default {
   name: 'sparkline-pie',
+  mixins: [MaxZIndex],
   props: {
     data: {
       type: Array,
@@ -62,16 +65,21 @@ export default {
   methods: {
     hideTooltip () {
       const tooltip = this.$parent.$refs.sparklineTooltip
+
       tooltip && (tooltip.style.display = 'none')
     },
     showTooltip (evt, value, color) {
       const tooltip = this.$parent.$refs.sparklineTooltip
+
       tooltip && (tooltip.style.display = '')
+
       const leeway = tooltip.getBoundingClientRect()
       const tooltipContent = `<span style="color:${color};">&bull;</span>&nbsp;${value}<br />`
+
       if (leeway) {
         tooltip.style.left = `${evt.clientX + leeway.width * .25}px`
         tooltip.style.top = `${evt.clientY - leeway.height}px`
+        tooltip.style.zIndex = this.zIndex
         try {
           tooltip.innerHTML = this.tooltipProps.formatter({ value, color}) || tooltipContent
         } catch (e) {
@@ -81,7 +89,16 @@ export default {
     }
   },
   render (h) {
-    const { data = [], width, height, margin, styles, tooltipProps, indicatorStyles } = this
+    const {
+      data = [],
+      width,
+      height,
+      // margin,
+      styles,
+      // tooltipProps,
+      indicatorStyles
+    } = this
+
     if (!data.length) {
       return null
     }
@@ -90,23 +107,27 @@ export default {
     const radius = center - strokeWidth / 2
     // const radius = center - margin
     let prevPieNumbers = 0
+
     for (let slot of this.$parent.$slots.default) {
       (slot.tag === 'sparklinePie') && prevPieNumbers++
     }
     if (prevPieNumbers > 1) {
       return null
     }
+
     const total = Math.ceil(data.reduce((a, b) => (b.hasOwnProperty('value') ? b.value : b) + a, 0))
     let angleStart = 0
     let angleEnd = 0
     // const startX = center + (prevPieNumbers > 1 ? prevPieNumbers - 1 : 0) * (radius + margin * 2)
     const startX = center
+
     return h('g', {
       attrs: {
         // transform: `translate(0, 0)`
       }
     }, (() => {
       const items = []
+
       if (data.length === 1) {
         items.push(h('ellipse', {
           style: styles,
@@ -133,14 +154,17 @@ export default {
           const value = d.hasOwnProperty('value') ? d.value : d
           const isLarge = value / total > 0.5
           const angle = 360 * value / total
+
           angleStart = angleEnd
           angleEnd = angleStart + angle
+
           const x1 = startX + radius * Math.cos(Math.PI * angleStart / 180)
           const y1 = center + radius * Math.sin(Math.PI * angleStart / 180)
           const x2 = startX + radius * Math.cos(Math.PI * angleEnd / 180)
           const y2 = center + radius * Math.sin(Math.PI * angleEnd / 180)
           const path = `M${startX},${center} L${x1},${y1} A${radius},${radius} 0 ${isLarge ? 1 : 0},1 ${x2},${y2} Z`
           const color = d.hasOwnProperty('color') ? d.color : (styles && styles.fill || '#000')
+
           items.push(h('path', {
             style: styles,
             attrs: {

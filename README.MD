@@ -1,6 +1,6 @@
 # Vue Sparklines
 
-Sparkline chart built with Vue, by zhaopin.com CRM FE team.
+Sparkline chart built with Vue, by Zen (tangzhen@me.com).
 
 This chart toolkit (small & smart chart named sparkline) includes:
 

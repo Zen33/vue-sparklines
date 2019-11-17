@@ -68,9 +68,12 @@ export default {
       default: 'mean'
     },
     refLineStyles: {
-      stroke: '#d14',
-      strokeOpacity: 1,
-      strokeDasharray: '2, 2'
+      type: Object,
+      default: () => ({
+        stroke: '#d14',
+        strokeOpacity: 1,
+        strokeDasharray: '2, 2'
+      })
     },
     refLineProps: {
       type: Object,
@@ -88,10 +91,29 @@ export default {
     }
   },
   render (h) {
-    const { data = [], hasSpot, limit, width, height, margin, styles, max, min, spotlight, spotStyles, spotProps, refLineStyles, bus, mouseEvents, textStyles} = this
+    const {
+      data = [],
+      hasSpot,
+      limit,
+      width,
+      height,
+      margin,
+      styles,
+      max,
+      min,
+      spotlight,
+      spotStyles,
+      spotProps,
+      refLineStyles,
+      bus,
+      mouseEvents,
+      textStyles
+    } = this
+
     if (!data.length) {
       return null
     }
+
     const hasSpotlight = typeof spotlight === 'number'
     const leeway = 10
     const points = dataToPoints({
@@ -104,6 +126,7 @@ export default {
       min,
       textHeight: hasSpotlight ? leeway : 0
     })
+
     bus && bus.$emit('setValue', {
       id: `sparkline__${this._uid}`,
       color: styles.stroke || styles.fill || '#fff',
@@ -112,6 +135,7 @@ export default {
       limit,
       type: 'line'
     })
+
     const linePoints = points.map(p => [p.x, p.y]).reduce((a, b) => a.concat(b))
     const closePolyPoints = [
       points[points.length - 1].x,
@@ -137,7 +161,9 @@ export default {
       pointerEvents: 'auto'
     }
     const props = this.$props
+
     props.points = points
+
     const checkSpotType = (items, p, i) => {
       if (!hasSpot && !hasSpotlight) {
         return true
@@ -152,6 +178,7 @@ export default {
     }
     return h('g', (() => {
       const items = []
+
       items.push(h('polyline', {
         style: fillStyle,
         attrs: {

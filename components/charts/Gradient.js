@@ -12,6 +12,7 @@ export default {
         key: i
       }
     }))
+
     return h('defs', [
       h('linearGradient', {
         attrs: {

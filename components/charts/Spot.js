@@ -3,6 +3,7 @@ export default {
   methods: {
     lastPoint (points) {
       const pl = points.length
+
       Math.sign = Math.sign || (x => {
         return x > 0 ? 1 : -1
       })
@@ -12,8 +13,10 @@ export default {
   render (h) {
     const { points, spotStyles, spotProps } = this
     const pl = points.length
+
     return h('g', (() => {
       const items = []
+
       spotStyles && items.push(h('circle', {
         style: spotStyles,
         attrs: {
