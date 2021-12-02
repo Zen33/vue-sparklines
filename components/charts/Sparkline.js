@@ -202,7 +202,7 @@ export default {
           const tag = item.tag
           const props = Object.assign({}, rootProps, item.data && item.data.attrs || {})
 
-          if (tag.toLowerCase() === 'sparklineLine') {
+          if (tag.toLowerCase() === 'sparklineline') {
             return h(Line, { props })
           } else if (tag.toLowerCase() === 'sparklinecurve') {
             return h(Curve, { props })
