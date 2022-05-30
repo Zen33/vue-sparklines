@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ],
+    "target": "esnext",
+    "outDir": "lib",
+    "declaration": true,
+    "declarationDir": "./type",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "isolatedModules": false,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": false,
+    "removeComments": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "jsx": "preserve",
+    "baseUrl": "./"
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.tsx",
+    "./rollup.config.js"
+  ],
+  
+  "exclude": [
+    "node_modules",
+    "dist",
+    "lib",
+    "esm",
+    "es",
+  ],
+  "compileOnSave": false
+}

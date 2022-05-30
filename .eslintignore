@@ -1,0 +1,9 @@
+snapshot*
+node_modules
+temp*
+
+esm
+es
+lib
+dist
+cjs

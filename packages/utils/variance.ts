@@ -1,6 +1,6 @@
 import mean from './mean'
 
-export default data => {
+export default (data: number[]) => {
   const dataMean = mean(data)
   const sq = data.map(n => Math.pow(n - dataMean, 2))
 

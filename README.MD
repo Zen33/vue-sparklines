@@ -1,20 +1,20 @@
 # Vue Sparklines
 
-Sparkline chart built with Vue, by Zen (tangzhen@me.com).
+Sparkline charts based on Vue 3 & Typescript without other dependencies.
 
-This chart toolkit (small & smart chart named sparkline) includes:
-
+* Refactor
 * Line chart
 * Curve chart
 * Bar chart
 * Pie chart
 * Dynamic chart
 * Mixins
+* Gradient color chart
 * Tooltip & reference line
+### How to install
+```
+npm install vue-sparklines -D
 
-This chart toolkit has no dependencies other than Vue 2.x and works with all modern browsers.
+```
 
-Please visit http://www.7te.net/zp-ui/#/sparkline for live examples and documents.
-
-### How to use
-$ npm install vue-sparklines --save-dev
+Please visit http://www.7te.net/vue-sparklines for live examples and documents.
